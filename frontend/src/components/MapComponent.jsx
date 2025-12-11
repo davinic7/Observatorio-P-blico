@@ -36,8 +36,8 @@ const MapComponent = ({ empresas }) => {
                     >
                         <Popup>
                             <strong>{empresa.razon_social}</strong><br />
-                            {empresa.rubro_sector}<br />
-                            Dotación: {empresa.dotacion_personal}
+                            Rubro: {empresa.rubro}<br />
+                            Dotación: {empresa.dotacion_total}
                         </Popup>
                     </Marker>
                 )

@@ -7,11 +7,11 @@ const getEmpresas = async (req, res) => {
         e.id, 
         e.razon_social, 
         e.cuit, 
-        e.rubro_sector, 
-        e.dotacion_personal, 
+        e.rubro, 
+        e.dotacion_total, 
         e.exporta, 
         e.importa,
-        ST_AsGeoJSON(e.ubicacion_geografica)::json as ubicacion
+        json_build_object('coordinates', json_build_array(e.longitud, e.latitud)) as ubicacion
       FROM empresas e
     `;
         const result = await pool.query(query);
@@ -25,7 +25,7 @@ const getEmpresas = async (req, res) => {
 const getEstadisticas = async (req, res) => {
     try {
         // Example statistics queries
-        const rubroQuery = 'SELECT rubro_sector, COUNT(*) as count FROM empresas GROUP BY rubro_sector';
+        const rubroQuery = 'SELECT rubro, COUNT(*) as count FROM empresas GROUP BY rubro';
         const exportaQuery = 'SELECT exporta, COUNT(*) as count FROM empresas GROUP BY exporta';
 
         const [rubroResult, exportaResult] = await Promise.all([
@@ -45,7 +45,7 @@ const getEstadisticas = async (req, res) => {
 
 const getNoticias = async (req, res) => {
     try {
-        const query = 'SELECT * FROM noticias_proyectos WHERE validado = true ORDER BY fecha_publicacion DESC LIMIT 5';
+        const query = "SELECT * FROM noticias_proyectos WHERE estado = 'validado' ORDER BY fecha DESC LIMIT 5";
         const result = await pool.query(query);
         res.json(result.rows);
     } catch (error) {

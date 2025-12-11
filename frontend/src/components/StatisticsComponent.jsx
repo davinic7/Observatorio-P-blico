@@ -10,7 +10,7 @@ import {
     ArcElement
 } from 'chart.js';
 import { Bar, Pie } from 'react-chartjs-2';
-import { Box, Grid, Paper, Typography } from '@mui/material';
+import { Box, Grid, Paper, Typography, useTheme } from '@mui/material';
 
 ChartJS.register(
     CategoryScale,
@@ -23,13 +23,16 @@ ChartJS.register(
 );
 
 const StatisticsComponent = ({ estadisticas }) => {
+    const theme = useTheme();
+
     const rubroData = {
-        labels: estadisticas.empresasPorRubro ? estadisticas.empresasPorRubro.map(e => e.rubro_sector) : [],
+        labels: estadisticas.empresasPorRubro ? estadisticas.empresasPorRubro.map(e => e.rubro) : [],
         datasets: [
             {
                 label: 'Empresas por Rubro',
                 data: estadisticas.empresasPorRubro ? estadisticas.empresasPorRubro.map(e => e.count) : [],
-                backgroundColor: 'rgba(53, 162, 235, 0.5)',
+                backgroundColor: theme.palette.primary.main,
+                borderRadius: 4,
             },
         ],
     };
@@ -43,31 +46,66 @@ const StatisticsComponent = ({ estadisticas }) => {
                     estadisticas.exportadoras.find(e => !e.exporta)?.count || 0
                 ] : [],
                 backgroundColor: [
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(255, 99, 132, 0.2)',
+                    theme.palette.secondary.main, // Gold for exporters
+                    '#e0e0e0', // Grey for non-exporters
                 ],
-                borderColor: [
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(255, 99, 132, 1)',
-                ],
-                borderWidth: 1,
+                borderWidth: 0,
             },
         ],
     };
 
+    const optionsBar = {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false,
+            },
+            title: {
+                display: false,
+            },
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    display: true,
+                    drawBorder: false,
+                }
+            },
+            x: {
+                grid: {
+                    display: false,
+                }
+            }
+        },
+    };
+
+    const optionsPie = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            },
+        },
+    };
+
     return (
-        <Box sx={{ flexGrow: 1, p: 2 }}>
-            <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
-                    <Paper elevation={3} sx={{ p: 2 }}>
-                        <Typography variant="h6">Distribución por Rubro</Typography>
-                        <Bar data={rubroData} />
+        <Box sx={{ flexGrow: 1 }}>
+            <Grid container spacing={4}>
+                <Grid item xs={12} md={8}>
+                    <Paper elevation={0} sx={{ p: 4, height: '100%', border: '1px solid #e0e0e0', borderRadius: 3 }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>Distribución por Rubro Industrial</Typography>
+                        <Box height={300}>
+                            <Bar data={rubroData} options={optionsBar} />
+                        </Box>
                     </Paper>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                    <Paper elevation={3} sx={{ p: 2 }}>
-                        <Typography variant="h6">Perfil Exportador</Typography>
-                        <Pie data={exportaData} />
+                <Grid item xs={12} md={4}>
+                    <Paper elevation={0} sx={{ p: 4, height: '100%', border: '1px solid #e0e0e0', borderRadius: 3 }}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>Perfil Exportador</Typography>
+                        <Box height={300} display="flex" justifyContent="center">
+                            <Pie data={exportaData} options={optionsPie} />
+                        </Box>
                     </Paper>
                 </Grid>
             </Grid>
